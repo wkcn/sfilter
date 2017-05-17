@@ -27,6 +27,12 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import android42.sfilter.filters.CameraFilter;
 import android42.sfilter.filters.OriginalFilter;
+import android42.sfilter.filters.AsciiArtFilter;
+import android42.sfilter.filters.BasicDeformFilter;
+import android42.sfilter.filters.EdgeDetectionFilter;
+import android42.sfilter.filters.EMInterferenceFilter;
+import android42.sfilter.filters.LegofiedFilter;
+import android42.sfilter.filters.TileMosaicFilter;
 
 import android.util.Log;
 import android.view.View;
@@ -69,6 +75,13 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 		initGL(surfaceTexture);
 		// 加载滤镜
 		cameraFilterMap.append(0, new OriginalFilter(context));
+		cameraFilterMap.append(1, new AsciiArtFilter(context));
+		cameraFilterMap.append(2, new EdgeDetectionFilter(context));
+		cameraFilterMap.append(3, new EMInterferenceFilter(context));
+		cameraFilterMap.append(4, new LegofiedFilter(context));
+		cameraFilterMap.append(5, new OriginalFilter(context));
+		cameraFilterMap.append(6, new TileMosaicFilter(context));
+		cameraFilterMap.append(7, new BasicDeformFilter(context));
 		setFilter(filterID);
 		cameraTextureId = SGLU.genTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
 		cameraSurfaceTexture = new SurfaceTexture(cameraTextureId);
