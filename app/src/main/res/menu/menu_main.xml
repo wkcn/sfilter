@@ -1,6 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context="android42.sfilter.MainActivity">
-    <item android:id="@+id/action_settings" android:orderInCategory="100"
-        android:title="@string/action_settings" app:showAsAction="never" />
+    <item android:id="@+id/select_filter0" android:orderInCategory="100"
+        android:title="原图" app:showAsAction="never" />
+    <item android:id="@+id/select_filter1" android:orderInCategory="100"
+        android:title="Ascii码滤镜" app:showAsAction="never" />
+    <item android:id="@+id/select_filter2" android:orderInCategory="100"
+        android:title="边缘滤镜" app:showAsAction="never" />
+    <item android:id="@+id/select_filter3" android:orderInCategory="100"
+        android:title="电磁滤镜" app:showAsAction="never" />
+    <item android:id="@+id/select_filter4" android:orderInCategory="100"
+        android:title="乐高滤镜" app:showAsAction="never" />
+    <item android:id="@+id/select_filter5" android:orderInCategory="100"
+        android:title="贴片滤镜" app:showAsAction="never" />
+    <item android:id="@+id/select_filter6" android:orderInCategory="100"
+        android:title="水流滤镜" app:showAsAction="never" />
 </menu>

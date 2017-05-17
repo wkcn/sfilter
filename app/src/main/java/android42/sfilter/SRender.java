@@ -79,9 +79,8 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 		cameraFilterMap.append(2, new EdgeDetectionFilter(context));
 		cameraFilterMap.append(3, new EMInterferenceFilter(context));
 		cameraFilterMap.append(4, new LegofiedFilter(context));
-		cameraFilterMap.append(5, new OriginalFilter(context));
-		cameraFilterMap.append(6, new TileMosaicFilter(context));
-		cameraFilterMap.append(7, new BasicDeformFilter(context));
+		cameraFilterMap.append(5, new TileMosaicFilter(context));
+		cameraFilterMap.append(6, new BasicDeformFilter(context));
 		setFilter(filterID);
 		cameraTextureId = SGLU.genTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
 		cameraSurfaceTexture = new SurfaceTexture(cameraTextureId);

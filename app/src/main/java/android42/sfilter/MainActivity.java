@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.File;
@@ -43,15 +44,19 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 				renderer.switchCamera();
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "切换摄像头", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
+
+        //ImageButton captureBtn = (ImageButton)findViewById(R.id.captureBtn);
+
         Log.i(TAG, "camera permission");
 		// 申请相机权限
         if (ContextCompat.checkSelfPermission(this,
@@ -131,15 +136,32 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.select_filter0){
+            renderer.setFilter(0);
+        }else if (id == R.id.select_filter1){
+            renderer.setFilter(1);
+        }else if (id == R.id.select_filter2){
+            renderer.setFilter(2);
+        }else if (id == R.id.select_filter3){
+            renderer.setFilter(3);
+        }else if (id == R.id.select_filter4){
+            renderer.setFilter(4);
+        }else if (id == R.id.select_filter5){
+            renderer.setFilter(5);
+        }else if (id == R.id.select_filter6){
+            renderer.setFilter(6);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void onCaptureBtn(View view){
+        caputre();
+    }
+
     private boolean caputre() {
         String mPath = genSaveFileName(getTitle().toString() + "_", ".png");
+        Toast.makeText(this, "图片已保存到：" + mPath, Toast.LENGTH_SHORT).show();
         File imageFile = new File(mPath);
         if (imageFile.exists()) {
             imageFile.delete();

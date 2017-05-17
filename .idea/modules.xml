@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file:///mnt/wkcn/Projects/android/SFilter/SFilter.iml" filepath="/mnt/wkcn/Projects/android/SFilter/SFilter.iml" />
+      <module fileurl="file:///mnt/wkcn/Projects/android/SFilter/SFilter.iml" filepath="/mnt/wkcn/Projects/android/SFilter/SFilter.iml" />
+      <module fileurl="file:///mnt/wkcn/Projects/android/SFilter/app/app.iml" filepath="/mnt/wkcn/Projects/android/SFilter/app/app.iml" />
       <module fileurl="file:///mnt/wkcn/Projects/android/SFilter/app/app.iml" filepath="/mnt/wkcn/Projects/android/SFilter/app/app.iml" />
     </modules>
   </component>
