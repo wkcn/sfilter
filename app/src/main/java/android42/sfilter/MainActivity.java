@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
 	// 设置相机视图
     void setupCameraPreviewView() {
-        renderer = new SRender(this);
         textureView = (TextureView) findViewById(R.id.textureView);
+        renderer = new SRender(this, textureView);
         assert textureView != null;
         textureView.setSurfaceTextureListener(renderer);
         // Show original frame when touch the view
@@ -173,5 +173,7 @@ public class MainActivity extends AppCompatActivity {
         String externalPath = Environment.getExternalStorageDirectory().toString();
         return externalPath + "/" + prefix + timeString + suffix;
     }
+
+
 
 }

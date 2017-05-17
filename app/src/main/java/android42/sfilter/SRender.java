@@ -29,6 +29,7 @@ import android42.sfilter.filters.CameraFilter;
 import android42.sfilter.filters.OriginalFilter;
 
 import android.util.Log;
+import android.view.View;
 
 // 渲染器
 public class SRender implements Runnable, TextureView.SurfaceTextureListener {
@@ -41,6 +42,7 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
     private Context context;
     private SurfaceTexture surfaceTexture;
     private int gwidth, gheight;
+    private TextureView textureView;
 
 	// EGL
     private EGLDisplay eglDisplay;
@@ -57,8 +59,9 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
     private int filterID = 0;
     private SparseArray<CameraFilter> cameraFilterMap = new SparseArray<>();
 
-	public SRender(Context context){
+	public SRender(Context context, TextureView textureView){
         this.context = context;
+		this.textureView = textureView;
 	}
 	@Override
 	public void run(){
@@ -163,7 +166,7 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
                 Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             parameters.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
-        parameters.setRotation(90);
+        // parameters.setRotation(90);
         camera.setParameters(parameters);
 
 		try {
@@ -177,8 +180,16 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
 		final int numberOfCameras = Camera.getNumberOfCameras();
 		cameraID = (cameraID + 1) % numberOfCameras;
+		Camera.getCameraInfo(cameraID, cameraInfo);
 		releaseCamera();
-		openCamera(cameraID);
+        //textureView.setVisibility(View.GONE);
+		if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
+			textureView.setRotation(180);
+		}else{
+			textureView.setRotation(0);
+		}
+        openCamera(cameraID);
+		//textureView.setVisibility(View.VISIBLE);
 	}
 
     public void releaseCamera(){
