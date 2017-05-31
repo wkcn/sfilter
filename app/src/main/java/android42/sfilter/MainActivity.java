@@ -3,8 +3,11 @@ package android42.sfilter;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +23,7 @@ import android.view.GestureDetector;
 import android.view.WindowManager;
 import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
 	private static final int filterNum = 7;
     private static boolean capture_btn = true;
     FloatingActionButton fab;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +58,19 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        imageView = (ImageView)findViewById(R.id.imageView);
         //toolbar.setVisibility(View.INVISIBLE);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent albumIntent = new Intent(Intent.ACTION_PICK, null);
+                String path = getSDPath() + "/android42/";
+                File fi = new File(path);
+                albumIntent.setDataAndType(Uri.fromFile(fi), "image/*");
+                startActivity(albumIntent);
+            }
+        });
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -253,6 +270,23 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         caputre();
     }
 
+    private Bitmap scaleBitmap(Bitmap origin, int newWidth, int newHeight) {
+        if (origin == null) {
+            return null;
+        }
+        int height = origin.getHeight();
+        int width = origin.getWidth();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);// 使用后乘
+        Bitmap newBM = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, false);
+        if (!origin.isRecycled()) {
+            origin.recycle();
+        }
+        return newBM;
+    }
+
     private boolean caputre() {
         String mPath = genSaveFileName("android42_", ".png");
         Toast.makeText(this, "图片已保存到：" + mPath, Toast.LENGTH_SHORT).show();
@@ -263,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
 
         // create bitmap screen capture
         Bitmap bitmap = textureView.getBitmap();
+
         OutputStream outputStream = null;
 
         try {
@@ -271,6 +306,10 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
             outputStream.flush();
             outputStream.close();
             //Log.i(TAG, "SAVED OK");
+
+            Bitmap ibm = scaleBitmap(bitmap,imageView.getWidth(),imageView.getHeight());
+            //Log.i(TAG, "OOO");
+            imageView.setImageBitmap(ibm);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return false;
