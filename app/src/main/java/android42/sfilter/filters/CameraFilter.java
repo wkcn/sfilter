@@ -18,6 +18,7 @@ package android42.sfilter.filters;
 import android.content.Context;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.support.annotation.CallSuper;
 
 import java.nio.ByteBuffer;
@@ -49,6 +50,13 @@ public abstract class CameraFilter {
 
     private static final int BUF_ACTIVE_TEX_UNIT = GLES20.GL_TEXTURE8;
     private static RenderBuffer CAMERA_RENDER_BUF;
+	
+	private static float[] mymat = new float[16];
+	private static float[] mVMatrix = new float[16];
+	private static float[] mProjMatrix = new float[16];
+	private static float[] mMVPMatrix;
+	private static int muMVPMatrixHandle;//总变换矩阵引用id
+	
 
     private static final float ROATED_TEXTURE_COORDS[] = {
             1.0f, 0.0f,
@@ -106,6 +114,14 @@ public abstract class CameraFilter {
         // Use shaders
         GLES20.glUseProgram(PROGRAM);
 
+        // / mat
+        /*
+		Matrix.setRotateM(mymat, 0,0,0,1,0);
+		Matrix.rotateM(mymat, 0, 90, 1,1,1);
+		muMVPMatrixHandle = GLES20.glGetUniformLocation(PROGRAM, "uMVPMatrix");
+		GLES20.glUniformMatrix4fv(muMVPMatrixHandle,1, false, getFianlMatrix(mymat), 0);
+        */
+
         int iChannel0Location = GLES20.glGetUniformLocation(PROGRAM, "iChannel0");
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, cameraTexId);
@@ -119,16 +135,30 @@ public abstract class CameraFilter {
         GLES20.glEnableVertexAttribArray(vTexCoordLocation);
         GLES20.glVertexAttribPointer(vTexCoordLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, ROATED_TEXTURE_COORD_BUF);
 
+
+
         // Render to texture
         CAMERA_RENDER_BUF.bind();
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
         CAMERA_RENDER_BUF.unbind();
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+
 
         onDraw(CAMERA_RENDER_BUF.getTexId(), canvasWidth, canvasHeight);
 
         iFrame++;
+    }
+
+    public static float[] getFianlMatrix(float[] spec)
+    {
+        mMVPMatrix=new float[16];
+        Matrix.multiplyMM(mMVPMatrix, 0, mVMatrix, 0, spec, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mMVPMatrix, 0);
+        return mMVPMatrix;
     }
 
     abstract void onDraw(int cameraTexId, int canvasWidth, int canvasHeight);

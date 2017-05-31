@@ -20,9 +20,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -81,7 +86,16 @@ public class SGLU {
             // Decode
             options.inJustDecodeBounds = false;
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+            /*
+            Bitmap bitmap = Bitmap.createBitmap(size[0], size[1], Bitmap.Config.ARGB_8888);// 创建一个新的和SRC长度宽度一样的位图
 
+            Canvas cv = new Canvas(bitmap);
+            Matrix m = new Matrix();
+            m.postScale(1, -1);   //镜像垂直翻转
+            m.postScale(-1, 1);   //镜像水平翻转
+            m.postRotate(-90);  //旋转-90度
+            //cv.drawBitmap(bitmapold, new Rect(0, 0, size[0], size[1]),new Rect(0, 0, size[0], size[1]), null);
+            */
             // Load the bitmap into the bound texture.
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
 

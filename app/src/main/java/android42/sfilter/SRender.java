@@ -6,6 +6,7 @@ package android42.sfilter;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -16,6 +17,7 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.TextureView;
 import android.view.Surface;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -58,6 +60,8 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 
     private Camera camera = null;
 	private int cameraID = 0;
+	private boolean isSupportFlashCamera = true;
+    private int cameraFlash = 2;
 
     private SurfaceTexture cameraSurfaceTexture;
     private int cameraTextureId;
@@ -68,6 +72,7 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 	public SRender(Context context, TextureView textureView){
         this.context = context;
 		this.textureView = textureView;
+		//isSupportFlashCamera = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
 	}
 	@Override
 	public void run(){
@@ -208,6 +213,36 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
         }
     }
 
+    public void changeCameraFlash() {
+        if (!isSupportFlashCamera) {
+            Toast.makeText(context, "您的手机不支闪光", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(camera != null) {
+            Camera.Parameters parameters = camera.getParameters();
+            if(parameters != null) {
+                int newState = cameraFlash;
+                switch (cameraFlash) {
+                    case 0: //自动
+                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                        newState = 1;
+                        break;
+                    case 1://open
+                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                        newState = 2;
+                        break;
+                    case 2: //close
+                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+                        newState = 0;
+                        break;
+                }
+                cameraFlash = newState;
+                // CameraUtils.setCameraFlash(context, newState);
+                camera.setParameters(parameters);
+            }
+        }
+    }
+
 	public void switchCamera(){
 		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
 		final int numberOfCameras = Camera.getNumberOfCameras();
@@ -216,9 +251,16 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 		releaseCamera();
         //textureView.setVisibility(View.GONE);
 		if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
-			textureView.setRotation(180);
+			//textureView.setRotation(180);
+            Matrix mat = new Matrix();
+            //textureView.getTransform(mat);
+            mat.postScale(1,-1);
+            mat.postTranslate(0,textureView.getHeight());
+            textureView.setTransform(mat);
 		}else{
-			textureView.setRotation(0);
+            Matrix mat = new Matrix();
+            textureView.setTransform(mat);
+			//textureView.setRotation(0);
 		}
         openCamera(cameraID);
 		//textureView.setVisibility(View.VISIBLE);

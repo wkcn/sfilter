@@ -18,8 +18,11 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.GestureDetector;
 import android.view.WindowManager;
+import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.content.Context;
+import android.util.AttributeSet;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,18 +31,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
 
 import android.util.Log;
 
-
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements OnLongClickListener{
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CAMERA_PERMISSION = 101;
+    private static final String[] FILTER_NAMES = {"原图","Ascii码滤镜","边缘滤镜","电磁滤镜","乐高滤镜","贴片滤镜","水流滤镜"};
     private SRender renderer;
     private TextureView textureView;
-	private GestureDetector gestureDetector;
     private int filterId = 0;
+    private int filterIdOld = 0;
 	private static final int filterNum = 7;
+    private static boolean capture_btn = true;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,17 +55,16 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         //toolbar.setVisibility(View.INVISIBLE);
 
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-				renderer.switchCamera();
-                Snackbar.make(view, "切换摄像头", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (capture_btn)
+                    caputre();
+                capture_btn = true;
             }
         });
+        fab.setOnLongClickListener(this);
 
         //ImageButton captureBtn = (ImageButton)findViewById(R.id.captureBtn);
 
@@ -84,33 +89,77 @@ public class MainActivity extends AppCompatActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-        gestureDetector = new GestureDetector(textureView.getContext(), myGestureListener);
+        textureView.setOnTouchListener(new View.OnTouchListener() {
+                                           private float startX, startY, oldX, oldY, offsetX, offsetY;
+                                           private float actionX, actionY;
+
+                                           @Override
+                                           public boolean onTouch(View v, MotionEvent event) {
+                                               switch (event.getAction()) {
+                                                   case MotionEvent.ACTION_DOWN:
+                                                       startX = event.getX();
+                                                       startY = event.getY();
+                                                       oldX = startX;
+                                                       oldY = startY;
+                                                       offsetX = 0;
+                                                       offsetY = 0;
+                                                       break;
+                                                   case MotionEvent.ACTION_MOVE:
+                                                       offsetX = event.getX() - oldX;
+                                                       offsetY = event.getY() - oldY;
+                                                       if (Math.abs(offsetX) > Math.abs(offsetY)){
+                                                           actionX = offsetX;
+                                                           actionY = 0;
+                                                       }else{
+                                                           actionX = 0;
+                                                           actionY = offsetY;
+                                                       }
+                                                       if (actionY < 0){
+                                                           renderer.handleZoom(false);
+                                                       }else if (actionY > 0){
+                                                           renderer.handleZoom(true);
+                                                       }
+                                                       oldX = event.getX();
+                                                       oldY = event.getY();
+                                                       break;
+                                                   case MotionEvent.ACTION_UP:
+                                                       if (actionX > 0){
+                                                           // Right
+                                                           filterId = (filterId + 1) % filterNum;
+                                                       }else if (actionX < 0){
+                                                           // Left
+                                                           filterId = (filterId - 1 + filterNum) % filterNum;
+                                                       }
+                                                       switchFilter();
+                                                       break;
+
+
+                                               }
+                                               return true;
+                                           }
+
+                                       }
+            );
     }
 
-	// 手势识别
-	private GestureDetector.OnGestureListener myGestureListener = new GestureDetector.SimpleOnGestureListener(){
-		@Override
-		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
-			Log.i(TAG, "onFling");
-			float x = e2.getX() - e1.getX();
-			float y = e2.getY() - e1.getY();
-			if (x > 0){
-				// Right
-				filterId = (filterId + 1) % filterNum;
-			}else if (x < 0){
-				// Left
-				filterId = (filterId - 1 + filterNum) % filterNum;
-			}
-			switchFilter();
-			return true;
-		}
-	};
+    public boolean onLongClick(View view) {//实现接口中的方法
+        if(view == fab){//当按下的是按钮时
+            /*
+            Toast.makeText(
+                    this,
+                    "长时间按下了按钮",
+                    Toast.LENGTH_SHORT
+            ).show();//显示提示
+            */
+            renderer.switchCamera();
+            Snackbar.make(view, "切换摄像头", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            capture_btn = false;
+        }
+        return false;
+    }
 
-	public boolean onTouchEvent(MotionEvent event){
-		return gestureDetector.onTouchEvent(event);
-	}
-
-	// 申请权限
+    // 申请权限
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -163,7 +212,12 @@ public class MainActivity extends AppCompatActivity{
     }
 
 	public void switchFilter(){
-		renderer.setFilter(filterId);
+        renderer.setFilter(filterId);
+        if (filterId != filterIdOld){
+            Snackbar.make(textureView, "切换为：" + FILTER_NAMES[filterId], Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            filterIdOld = filterId;
+        }
 	}
 
     @Override
@@ -200,6 +254,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private boolean caputre() {
+        String sdpath = 
         String mPath = genSaveFileName(getTitle().toString() + "_", ".png");
         Toast.makeText(this, "图片已保存到：" + mPath, Toast.LENGTH_SHORT).show();
         File imageFile = new File(mPath);
