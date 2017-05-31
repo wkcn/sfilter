@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
+import android.view.GestureDetector;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -30,12 +32,14 @@ import java.util.Date;
 import android.util.Log;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CAMERA_PERMISSION = 101;
     private SRender renderer;
     private TextureView textureView;
+	private GestureDetector gestureDetector;
     private int filterId = 0;
+	private static final int filterNum = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //toolbar.setVisibility(View.INVISIBLE);
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -74,7 +80,35 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setupCameraPreviewView();
         }
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        gestureDetector = new GestureDetector(textureView.getContext(), myGestureListener);
     }
+
+	// 手势识别
+	private GestureDetector.OnGestureListener myGestureListener = new GestureDetector.SimpleOnGestureListener(){
+		@Override
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
+			Log.i(TAG, "onFling");
+			float x = e2.getX() - e1.getX();
+			float y = e2.getY() - e1.getY();
+			if (x > 0){
+				// Right
+				filterId = (filterId + 1) % filterNum;
+			}else if (x < 0){
+				// Left
+				filterId = (filterId - 1 + filterNum) % filterNum;
+			}
+			switchFilter();
+			return true;
+		}
+	};
+
+	public boolean onTouchEvent(MotionEvent event){
+		return gestureDetector.onTouchEvent(event);
+	}
 
 	// 申请权限
     @Override
@@ -128,8 +162,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+	public void switchFilter(){
+		renderer.setFilter(filterId);
+	}
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //renderer.handleZoom(true);
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -137,20 +176,21 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.select_filter0){
-            renderer.setFilter(0);
+			filterId = 0;
         }else if (id == R.id.select_filter1){
-            renderer.setFilter(1);
+			filterId = 1;
         }else if (id == R.id.select_filter2){
-            renderer.setFilter(2);
+			filterId = 2;
         }else if (id == R.id.select_filter3){
-            renderer.setFilter(3);
+			filterId = 3;
         }else if (id == R.id.select_filter4){
-            renderer.setFilter(4);
+			filterId = 4;
         }else if (id == R.id.select_filter5){
-            renderer.setFilter(5);
+			filterId = 5;
         }else if (id == R.id.select_filter6){
-            renderer.setFilter(6);
+			filterId = 6;
         }
+		switchFilter();
 
         return super.onOptionsItemSelected(item);
     }

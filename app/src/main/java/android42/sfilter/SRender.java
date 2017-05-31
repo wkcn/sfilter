@@ -188,6 +188,26 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 		}
 	}
 
+    public void handleZoom(boolean isZoomIn) {
+        //Log.i(TAG, "handleZoom");
+        if (camera == null) return;
+        Camera.Parameters params = camera.getParameters();
+        if (params == null) return;
+        if (params.isZoomSupported()) {
+            int maxZoom = params.getMaxZoom();
+            int zoom = params.getZoom();
+            if (isZoomIn && zoom < maxZoom) {
+                zoom++;
+            } else if (zoom > 0) {
+                zoom--;
+            }
+            params.setZoom(zoom);
+            camera.setParameters(params);
+        } else {
+            //LogUtils.i("zoom not supported");
+        }
+    }
+
 	public void switchCamera(){
 		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
 		final int numberOfCameras = Camera.getNumberOfCameras();
