@@ -7,28 +7,10 @@
 
     <include layout="@layout/content_main"
         android:id="@+id/include"
-        android:layout_height="563dp" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="26dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_menu_rotate" />
-
-
-    <ImageButton
-        android:id="@+id/captureBtn"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:onClick="onCaptureBtn"
-        app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="bottom|center_horizontal"
-        app:srcCompat="@android:drawable/ic_menu_camera"
-        tools:layout_editor_absoluteX="164dp"
-        tools:layout_editor_absoluteY="443dp" />
+        android:layout_width="wrap_content"
+        />
+
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -37,6 +19,17 @@
         android:background="@android:color/transparent"
         android:minHeight="60dp"
         app:popupTheme="@style/AppTheme" />
+
+    <android42.sfilter.FloatingDraftButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_margin="@dimen/fab_margin"
+        android:clickable="false"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="bottom|center_horizontal"
+        app:srcCompat="@android:drawable/ic_menu_camera" />
 
 
 </android.support.design.widget.CoordinatorLayout>

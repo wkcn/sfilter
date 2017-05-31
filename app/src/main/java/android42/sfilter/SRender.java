@@ -254,8 +254,10 @@ public class SRender implements Runnable, TextureView.SurfaceTextureListener {
 			//textureView.setRotation(180);
             Matrix mat = new Matrix();
             //textureView.getTransform(mat);
+
             mat.postScale(1,-1);
             mat.postTranslate(0,textureView.getHeight());
+
             textureView.setTransform(mat);
 		}else{
             Matrix mat = new Matrix();

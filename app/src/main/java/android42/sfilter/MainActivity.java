@@ -254,8 +254,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     }
 
     private boolean caputre() {
-        String sdpath = 
-        String mPath = genSaveFileName(getTitle().toString() + "_", ".png");
+        String mPath = genSaveFileName("android42_", ".png");
         Toast.makeText(this, "图片已保存到：" + mPath, Toast.LENGTH_SHORT).show();
         File imageFile = new File(mPath);
         if (imageFile.exists()) {
@@ -271,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
             outputStream.flush();
             outputStream.close();
-
+            //Log.i(TAG, "SAVED OK");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -283,12 +282,30 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         return true;
     }
 
+    public String getSDPath(){
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState()
+                .equals(android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
+        if (sdCardExist)
+        {
+            sdDir = Environment.getExternalStorageDirectory();// 获取跟目录
+            return sdDir.toString();
+        }
+
+        return null;
+    }
+
     private String genSaveFileName(String prefix, String suffix) {
         Date date = new Date();
         SimpleDateFormat dateformat1 = new SimpleDateFormat("yyyyMMdd_hhmmss");
         String timeString = dateformat1.format(date);
-        String externalPath = Environment.getExternalStorageDirectory().toString();
-        return externalPath + "/" + prefix + timeString + suffix;
+        //String externalPath = Environment.getExternalStorageDirectory().toString();
+        String path = getSDPath();
+        File dir = new File(path + "/android42");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return dir + "/" + prefix + timeString + suffix;
     }
 
 
